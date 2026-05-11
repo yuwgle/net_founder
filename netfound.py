@@ -49,9 +49,12 @@ def ssh_request_cmd(ip, port, protocol : str, cmd : str) -> str:
             cin, cout, cerr = client.exec_command(cmd)
             # print(f"ssh:{ip}, hostname:", str(cout.read()))
             return str(cout.read())
-        except paramiko.ssh_exception.AuthenticationException:
-            # print(f"[ERROR]ssh:{ip}, auth error")
+        except paramiko.ssh_exception.AuthenticationException as e:
+            # print(f"[ERROR]ssh:{ip}, auth error: {e}")
             return "auth error"
+        except paramiko.ssh_exception.IncompatiblePeer as e:
+            # print(f"[ERROR]ssh:{ip}, incompatible peer: {e}")
+            return "incompatible peer"
         except Exception as e:
             # print(f"[ERROR]ssh:{ip}, error: {e}")
             return "error"
