@@ -42,7 +42,7 @@ def http_open_browser(ip, port, protocol, value):
     return None
 
 def ssh_request_cmd(ip, port, protocol : str, cmd : str) -> str:
-    """SSH 执行命令，忽略 known_hosts 缓存避免 IP 冲突问题"""
+    """SSH 执行命令，paramiko 2.12.0 原生支持 ssh-rsa"""
 
     def _do_ssh() -> str:
         client = paramiko.SSHClient()
@@ -62,6 +62,9 @@ def ssh_request_cmd(ip, port, protocol : str, cmd : str) -> str:
     except paramiko.ssh_exception.AuthenticationException as e:
         print(f"[ERROR]ssh:{ip}, auth error: {e}")
         return "auth error"
+    except paramiko.ssh_exception.IncompatiblePeer as e:
+        print(f"[ERROR]ssh:{ip}, incompatible peer: {e}")
+        return "incompatible peer"
     except Exception as e:
         print(f"[ERROR]ssh:{ip}, error: {e}")
         return "error"
