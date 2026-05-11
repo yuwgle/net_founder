@@ -42,22 +42,29 @@ def http_open_browser(ip, port, protocol, value):
     return None
 
 def ssh_request_cmd(ip, port, protocol : str, cmd : str) -> str:
-    with paramiko.SSHClient() as client:
+    """SSH 执行命令，忽略 known_hosts 缓存避免 IP 冲突问题"""
+
+    def _do_ssh() -> str:
+        client = paramiko.SSHClient()
+        # 清空主机密钥，避免 known_hosts 中旧设备密钥与新设备冲突
+        client.get_host_keys().clear()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             client.connect(ip, port, username=SSH_USERNAME, password=SSH_PASSWORD, timeout=3)
             cin, cout, cerr = client.exec_command(cmd)
-            # print(f"ssh:{ip}, hostname:", str(cout.read()))
-            return str(cout.read())
-        except paramiko.ssh_exception.AuthenticationException as e:
-            # print(f"[ERROR]ssh:{ip}, auth error: {e}")
-            return "auth error"
-        except paramiko.ssh_exception.IncompatiblePeer as e:
-            # print(f"[ERROR]ssh:{ip}, incompatible peer: {e}")
-            return "incompatible peer"
-        except Exception as e:
-            # print(f"[ERROR]ssh:{ip}, error: {e}")
-            return "error"
+            result = str(cout.read())
+        finally:
+            client.close()
+        return result
+
+    try:
+        return _do_ssh()
+    except paramiko.ssh_exception.AuthenticationException as e:
+        print(f"[ERROR]ssh:{ip}, auth error: {e}")
+        return "auth error"
+    except Exception as e:
+        print(f"[ERROR]ssh:{ip}, error: {e}")
+        return "error"
 
 def test_port_open(ip, port : int) -> bool:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:

@@ -1,0 +1,57 @@
+{
+  "generated_at": "2026-05-11T11:58:21",
+  "project_name": "net_founder",
+  "project_type": "single_module_python_tool",
+
+  "summary": {
+    "total_files": 50,
+    "source_files": 2,
+    "config_files": 3,
+    "doc_files": 4,
+    "coverage_percent": 100,
+    "truncated": false
+  },
+
+  "modules": [
+    {
+      "name": "netfound.py",
+      "path": "netfound.py",
+      "language": "Python",
+      "type": "core_library",
+      "responsibility": "网络探测核心逻辑 (端口测试/SSH/PING)",
+      "entry_point": "testip()",
+      "has_tests": false,
+      "interfaces": ["testip", "add_port_tester", "test_port_open", "PortTester"],
+      "dependencies": ["requests", "paramiko", "pythonping", "socket"]
+    },
+    {
+      "name": "netfound_gui.py",
+      "path": "netfound_gui.py",
+      "language": "Python",
+      "type": "gui_application",
+      "responsibility": "Tkinter GUI界面与用户交互",
+      "entry_point": "MainDialog.mainloop()",
+      "has_tests": false,
+      "interfaces": ["MainDialog class", "start_click", "stop_click"],
+      "dependencies": ["tkinter", "asyncio", "threading", "netfound"]
+    }
+  ],
+
+  "skipped_paths": [
+    {"pattern": "__pycache__/**", "reason": "Python字节码缓存"},
+    {"pattern": "build/**", "reason": "PyInstaller构建目录"},
+    {"pattern": "dist/**", "reason": "打包输出目录"},
+    {"pattern": ".git/**", "reason": "Git版本控制目录"}
+  ],
+
+  "gaps": [
+    {"module": "netfound.py", "missing": "unit_tests", "priority": "medium"},
+    {"module": "netfound_gui.py", "missing": "unit_tests", "priority": "medium"}
+  ],
+
+  "next_steps": [
+    "建议添加 pytest 单元测试覆盖核心探测函数",
+    "考虑添加日志模块记录扫描过程",
+    "可增加结果导出功能 (CSV/JSON)"
+  ]
+}
